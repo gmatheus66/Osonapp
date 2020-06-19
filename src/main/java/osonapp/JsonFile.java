@@ -37,28 +37,34 @@ public class JsonFile {
     public void AddtoJson(FileUser objuser) throws IOException {
 
         try{
+            ArrayList<FileUser> fileArrayList = new ArrayList<>();
             Gson gson = new Gson();
-            Type userListType = new TypeToken<ArrayList<FileUser>>(){}.getType();
             BufferedReader br = new BufferedReader(new FileReader(this.getPath()));
-            ArrayList<FileUser> fileArrayList = gson.fromJson(br, userListType);
-            fileArrayList.add(objuser);
+            if(fileArrayList.size() > 0 ){
+                Type userListType = new TypeToken<ArrayList<FileUser>>(){}.getType();
+                fileArrayList = gson.fromJson(br, userListType);
+                fileArrayList.add(objuser);
+            }
+            else{
+                fileArrayList.add(objuser);
+            }
             String userjson = gson.toJson(fileArrayList);
-            FileWriter writer =  new FileWriter(path);
+            FileWriter writer =  new FileWriter(this.getPath());
             writer.write(userjson);
             writer.close();
-
         }catch (IOException e){
             e.printStackTrace();
         }
+
     }
 
     public FileUser SearchFile(String name, String pathfile){
         try{
+            ArrayList<FileUser> fileArrayList = new ArrayList<>();
             Gson gson = new Gson();
             BufferedReader br = new BufferedReader(new FileReader(this.getPath()));
             Type userListType = new TypeToken<ArrayList<FileUser>>(){}.getType();
-            ArrayList<FileUser> fileArrayList = gson.fromJson(br, userListType);
-
+            fileArrayList = gson.fromJson(br, userListType);
             for (FileUser file: fileArrayList) {
                 if(file.getName().equals(name) && file.getPath().equals(pathfile)){
                     return file;
@@ -74,10 +80,10 @@ public class JsonFile {
     public void DeleteFile(FileUser userfile){
         try{
             Gson gson = new Gson();
+            ArrayList<FileUser> fileArrayList = new ArrayList<>();
             BufferedReader br = new BufferedReader(new FileReader(this.getPath()));
             Type userListType = new TypeToken<ArrayList<FileUser>>(){}.getType();
-            ArrayList<FileUser> fileArrayList = gson.fromJson(br, userListType);
-            ArrayList<FileUser> fileArrayListcopy = gson.fromJson(br, userListType);
+            fileArrayList = gson.fromJson(br, userListType);
             for (int t = 0; t < fileArrayList.size(); t++){
                 if(fileArrayList.get(t).getName().equals(userfile.getName()) && fileArrayList.get(t).getName().equals(userfile.getName()) ){
                     fileArrayList.remove(t);
