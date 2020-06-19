@@ -65,6 +65,8 @@ public class Monitor {
 	public void disconect(File filedeleted) {
 		if (filedeleted.exists()) {
 			filedeleted.delete();
+			File json = new File("files.json");
+			json.delete();
 		}
 	}
 
@@ -84,7 +86,6 @@ public class Monitor {
 
 	public void init() throws IOException {
 		this.VerifyFolder(this.getPath());
-
 	}
 
 	public void VerifyFolder(String path) {
@@ -151,7 +152,7 @@ public class Monitor {
 						if( ufile.getLength() != fullPath.toFile().length() && ufile.getPath().equals(fullPath.toFile().getPath())){
 						System.out.println("Adicionando Modificação do arquivo");
 							this.getService().files().delete(ufile.getId()).execute();
-							//jsonFile.DeleteFile(ufile);
+							jsonFile.DeleteFile(ufile);
 							java.io.File filePath = new java.io.File(fullPath.toString());
 							FileContent mediaContent = new FileContent(Files.probeContentType(source), filePath);
 							com.google.api.services.drive.model.File fileMetadata = new com.google.api.services.drive.model.File();
@@ -164,6 +165,7 @@ public class Monitor {
 							fileUser.setName(newPath.toString());
 							jsonFile.AddtoJson(fileUser);
 							System.out.println("Arquivo  Modificado: " + newPath);
+
 						}
 
 
