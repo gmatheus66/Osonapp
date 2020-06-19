@@ -29,7 +29,6 @@ import java.util.Scanner;
 public class Osonapp {
 	private String path;
 	private Monitor monitor;
-	private GDrive driveAction;
 
 	private static final String APPLICATION_NAME = "osonapp";
 	private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
@@ -60,66 +59,41 @@ public class Osonapp {
 		File fileMetadata = new File();
 		final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
 
-		driveAction = new GDrive();
 		Drive service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
 				.setApplicationName(APPLICATION_NAME)
 				.build();
-		driveAction.setService(service);
 
 		System.out.println("Bem vindo ao Osonapp");
-		System.out.println("Digite o caminho do arquivo");
-		String dir = sc.nextLine();
-		int decision =0;
+
 		System.out.println("Deseja contiuar logado ?");
 		System.out.println("1. Sim    2. Não");
-		decision = sc.nextInt();
-		monitor = new Monitor(dir,service);
+		int decision = sc.nextInt();
+		Monitor monitor = new Monitor(service);
 		if(decision == 1){
-			/*
-			System.out.println("Digite o nome da pasta que sera criada");
-			String folder = sc.nextLine();
-			driveAction.CreateFolder(folder);
-			*/
-			//driveAction.ListFiles();
-			if(monitor.VerifyExistsFolder(dir) ){
-				this.setPath(dir);
-				monitor.init();
-				//monitor.VerifyFolder(this.getPath());
+			Boolean folderexist = false;
+			while(!folderexist){
+				System.out.println("Digite o caminho do arquivo");
+				String dir = sc.nextLine();
+				monitor.setPath(dir);
+				if (!monitor.VerifyExistsFolder()){
+					if(dir.length() > 0){
+						System.out.println("Diretorio Invalido");
+						System.out.println("------------------");
+						folderexist = false;
+					}
+				}
+				else{
+					folderexist = true;
+					monitor.init();
+				}
 			}
-			System.out.println( monitor.VerifyExistsFolder(dir) );
-
 
 		}
 		else if(decision == 2){
-			monitor.disconect(new java.io.File("tokens/StoredCredential"));
+			monitor.disconect(new java.io.File("tokens/StoredCredential"), new java.io.File("files.json") ) ;
 		}
-
-		//System.out.println(dir);
-
-		//System.out.println( monitor.getArquivos() );
 		sc.close();
 
-
-		/*
-		if(dir != null) {
-			FileList result = service.files().list()
-					.setPageSize(100)
-					.setFields("nextPageToken, files(id, name, size, modifiedTime, mimeType)")
-					.execute();
-			List<File> files = result.getFiles();
-			if (files == null || files.isEmpty()) {
-				System.out.println("No files found.");
-			} else {
-				System.out.println("Files:");
-				for (File file : files) {
-					System.out.printf("%s (%s)\n", file.getName(), file.getId());
-				}
-			}
-		}
-		*/
-    	//File diretorio =  new File("C:\\teste");
-    	//System.out.println(diretorio.exists());
-    	//System.out.println(this.getPath() );
 
     }
     
@@ -133,11 +107,6 @@ public class Osonapp {
     public static void main(String[] args) throws IOException, GeneralSecurityException, InterruptedException {
     	Osonapp osonapp = new Osonapp();
     	osonapp.init();
-    	//Path diretorio = Paths.get("C:\\stackoverflow");
-       	//System.out.println(osonapp.getPath());
-    	//path2 = diretorio.substring(0,3);
-    	//CodeSource codeSource = aclass.getProtectionDomain().getCodeSource();
-    	//System.out.println( App.class.getProtectionDomain().getCodeSource().getLocation().toString() );
     }
     
     
