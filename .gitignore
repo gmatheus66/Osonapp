@@ -1,5 +1,6 @@
 # Ignore Gradle project-specific cache directory
 .gradle
-
+tokens/StoredCredential
+files.json
 # Ignore Gradle build output directory
 build
