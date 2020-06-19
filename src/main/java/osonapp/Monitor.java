@@ -19,35 +19,23 @@ import java.nio.file.WatchService;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
-import com.google.api.client.googleapis.batch.BatchRequest;
-import com.google.api.client.googleapis.batch.json.JsonBatchCallback;
-import com.google.api.client.googleapis.json.GoogleJsonError;
-import com.google.api.client.http.HttpHeaders;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.FileList;
-import com.google.api.services.drive.model.Permission;
 
 import com.google.api.client.http.FileContent;
 
 public class Monitor {
 
-	private Thread threadMonitor;
 	private String path;
-	private File arquivos[];
 	private ArrayList<File> oldfiles = new ArrayList<>();
 	private ArrayList<com.google.api.services.drive.model.File> filesdrive = new ArrayList<>();
 	private GDrive drive = new GDrive();
 	JsonFile jsonFile = new JsonFile();
 	private Drive service;
 
-	public File[] getArquivos() {
-		return arquivos;
-	}
 
-	public Monitor(String path, Drive service) throws IOException {
-		this.setPath(path);
+	public Monitor( Drive service) throws IOException {
 		this.setService(service);
-		this.ListFiles();
 	}
 
 	public Drive getService() {
@@ -58,20 +46,16 @@ public class Monitor {
 		this.service = service;
 	}
 
-	public void setArquivos(File[] arquivos) {
-		this.arquivos = arquivos;
-	}
 
-	public void disconect(File filedeleted) {
-		if (filedeleted.exists()) {
-			filedeleted.delete();
-			File json = new File("files.json");
-			json.delete();
+	public void disconect(File filestoredcredential, File filejson) {
+		if (filestoredcredential.exists() && filejson.exists()) {
+			filestoredcredential.delete();
+			filejson.delete();
 		}
 	}
 
-	public boolean VerifyExistsFolder(String path) {
-		File file = new File(path);
+	public boolean VerifyExistsFolder() {
+		File file = new File(this.getPath());
 		return file.exists();
 	}
 
@@ -85,22 +69,11 @@ public class Monitor {
 	}
 
 	public void init() throws IOException {
-		this.VerifyFolder(this.getPath());
+		this.Start(this.getPath());
 	}
 
-	public void VerifyFolder(String path) {
+	public void Start(String path) {
 		File file = new File(path);
-
-		try {
-			Boolean isFolder = (Boolean) Files.getAttribute(file.toPath(),
-					"basic:isDirectory", NOFOLLOW_LINKS);
-			if (!isFolder) {
-				throw new IllegalArgumentException("Path: " + path
-						+ " is not a folder");
-			}
-		} catch (IOException ioe) {
-			ioe.printStackTrace();
-		}
 
 		System.out.println("Escutando na pasta: " + path);
 		FileSystem fs = file.toPath().getFileSystem();
@@ -139,6 +112,7 @@ public class Monitor {
 						jsonFile.AddtoJson(fileUser);
 						System.out.println("Arquivo criado: " + newPath);
 
+
 					} else if (ENTRY_MODIFY == kind) {
 						Path newPath = ((WatchEvent<Path>) watchEvent)
 								.context();
@@ -147,10 +121,8 @@ public class Monitor {
 						Path source = Paths.get(newPath.toString());
 						FileUser ufile = jsonFile.SearchFile(newPath.toString(), fullPath.toString() );
 						com.google.api.services.drive.model.File Gfile = this.getFileDrive(ufile);
-						System.out.println( ufile.getLength());
-						System.out.println(fullPath.toFile().length());
 						if( ufile.getLength() != fullPath.toFile().length() && ufile.getPath().equals(fullPath.toFile().getPath())){
-						System.out.println("Adicionando Modificação do arquivo");
+							System.out.println("Adicionando Modificação do arquivo");
 							this.getService().files().delete(ufile.getId()).execute();
 							jsonFile.DeleteFile(ufile);
 							java.io.File filePath = new java.io.File(fullPath.toString());
@@ -167,7 +139,6 @@ public class Monitor {
 							System.out.println("Arquivo  Modificado: " + newPath);
 
 						}
-
 
 					} else if (ENTRY_DELETE == kind) {
 						Path newPath = ((WatchEvent<Path>) watchEvent)
@@ -194,26 +165,6 @@ public class Monitor {
 		}
 
 	}
-	public void AddFileGDrive(Path pt, WatchEvent watchEvent) throws IOException {
-		WatchKey key = null;
-		FileUser fileUser = new FileUser();
-		Path dir = (Path) key.watchable();
-		Path fullPath = dir.resolve(watchEvent.context().toString());
-		com.google.api.services.drive.model.File fileMetadata = new com.google.api.services.drive.model.File();
-		fileMetadata.setName(pt.toString());
-		Path source = Paths.get(pt.toString());
-		java.io.File filePath = new java.io.File(fullPath.toString());
-		FileContent mediaContent = new FileContent(Files.probeContentType(source), filePath);
-		com.google.api.services.drive.model.File filed = this.getService().files().create(fileMetadata, mediaContent)
-				.setFields("id")
-				.execute();
-		fileUser.setName(pt.toString());
-		fileUser.setPath(fullPath.toString());
-		fileUser.setId(filed.getId());
-		jsonFile.AddtoJson(fileUser);
-	}
-
-
 
 	public void ListFiles() throws IOException {
 		String pageToken = null;
@@ -235,15 +186,6 @@ public class Monitor {
 		com.google.api.services.drive.model.File filedrive = service.files().get(file.getId()).execute();
 		if (filedrive != null) {
 				return filedrive;
-		}
-		return null;
-	}
-	public com.google.api.services.drive.model.File SearchFile(ArrayList<com.google.api.services.drive.model.File> files, String filename) {
-		for (com.google.api.services.drive.model.File file : files) {
-			if (filename.equals(file.getName())) {
-				System.out.println(file.getName());
-				return file;
-			}
 		}
 		return null;
 	}
