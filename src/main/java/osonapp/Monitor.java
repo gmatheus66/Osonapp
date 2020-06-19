@@ -29,7 +29,6 @@ public class Monitor {
 	private String path;
 	private ArrayList<File> oldfiles = new ArrayList<>();
 	private ArrayList<com.google.api.services.drive.model.File> filesdrive = new ArrayList<>();
-	private GDrive drive = new GDrive();
 	JsonFile jsonFile = new JsonFile();
 	private Drive service;
 
