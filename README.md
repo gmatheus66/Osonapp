@@ -10,7 +10,7 @@ Gradle > 6
 
 ## Run
 
-Baixar Dependencias 
+Baixar Dependências 
 ```
 $ gradle downloadDependencies
 ```
