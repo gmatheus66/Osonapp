@@ -88,14 +88,18 @@ public class JsonFile {
             Type userListType = new TypeToken<ArrayList<FileUser>>(){}.getType();
             fileArrayList = gson.fromJson(br, userListType);
             for (int t = 0; t < fileArrayList.size(); t++){
-                if(fileArrayList.get(t).getName().equals(userfile.getName()) && fileArrayList.get(t).getName().equals(userfile.getName()) ){
-                    fileArrayList.remove(t);
-                    String userjson = gson.toJson(fileArrayList);
-                    FileWriter writer =  new FileWriter(this.getPath());
-                    writer.write(userjson);
-                    writer.close();
+            System.out.println(fileArrayList.get(t));
+                if(fileArrayList.get(t) != null && fileArrayList.get(t).getName() != null && fileArrayList.get(t).getPath() != null){
+                    if(fileArrayList.get(t).getName().equals(userfile.getName()) && fileArrayList.get(t).getPath().equals(userfile.getPath()) ){
+                        fileArrayList.remove(t);
+                        String userjson = gson.toJson(fileArrayList);
+                        FileWriter writer =  new FileWriter(this.getPath());
+                        writer.write(userjson);
+                        writer.close();
+                    }
                 }
             }
+
 
         }
         catch (IOException e){

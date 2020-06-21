@@ -146,9 +146,14 @@ public class Monitor {
 						Path dir = (Path) key.watchable();
 						Path fullPath = dir.resolve(watchEvent.context().toString());
 						FileUser ufile = jsonFile.SearchFile(newPath.toString(), fullPath.toString() );
-						jsonFile.DeleteFile(ufile);
-						this.getService().files().delete(ufile.getId()).execute();
-						System.out.println("Arquivo deletado: " + newPath);
+						if(ufile != null){
+							jsonFile.DeleteFile(ufile);
+							this.getService().files().delete(ufile.getId()).execute();
+							System.out.println("Arquivo deletado: " + newPath);
+						}
+						else {
+							System.out.println("Este arquivo ainda nao foi monitorado");
+						}
 					}
 				}
 
