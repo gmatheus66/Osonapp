@@ -34,4 +34,4 @@ ex-atualizar: $ echo "teste 1" >> teste1.txt
 ex-remover: $ rm teste1.txt
 
 ##
-####Obs: O app ainda não foi verificado
+### Obs: O app ainda não foi verificado
