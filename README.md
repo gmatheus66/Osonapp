@@ -21,6 +21,7 @@ $ gradle run
 ```
 
 ##
+## Passos
 1- Pergunta se deseja contiuar logado
 
 2- Adicionar caminho do diretorio para ser monitorada (ex: /home/teste)
